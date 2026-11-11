@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0d18">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23172c2a'/%3E%3Cpath d='M6 22h7v-7h7V8h6' fill='none' stroke='%23a6ffd4' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <title>WALLRUN — Snake, reimagined</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+    :root{color-scheme:dark;--bg:#0a0d18;--panel:#111624;--line:#232a3d;--muted:#858da5;--white:#f2f5ff;--mint:#a6ffd4;--lime:#c8ff6b;--pink:#ff7f9d}
+    *{box-sizing:border-box} html{min-height:100%;background:var(--bg)} body{margin:0;min-height:100vh;color:var(--white);font-family:'Space Grotesk',sans-serif;background:radial-gradient(ellipse at 50% 0%,#171c31 0%,#0a0d18 58%);display:flex;justify-content:center;align-items:center;padding:30px 20px 24px}
+    button{font:inherit;color:inherit} .app{width:min(100%,1010px)}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}.brand{display:flex;align-items:center;gap:12px}.brand-mark{width:37px;height:37px;border:1px solid #364451;border-radius:11px;display:grid;place-items:center;color:var(--mint);background:linear-gradient(145deg,#172c2a,#101722);box-shadow:0 0 24px #a6ffd414}.brand-mark svg{width:23px}.brand-name{font-weight:700;letter-spacing:.14em;font-size:15px}.brand-sub{font:10px 'DM Mono',monospace;color:var(--muted);letter-spacing:.12em;margin-top:3px}.live-pill{border:1px solid #30364a;background:#111624;padding:8px 11px;border-radius:99px;color:#aab1c4;font:10px 'DM Mono',monospace;letter-spacing:.1em;display:flex;align-items:center;gap:8px}.live-dot{height:7px;width:7px;border-radius:50%;background:#83f5bb;box-shadow:0 0 11px #83f5bb88}
+    .heading{display:flex;justify-content:space-between;align-items:end;margin:0 1px 17px}.eyebrow{font:10px 'DM Mono',monospace;color:var(--mint);letter-spacing:.2em;text-transform:uppercase;margin-bottom:7px}.heading h1{font-size:clamp(23px,4vw,34px);line-height:1;margin:0;letter-spacing:-.055em;font-weight:600}.heading p{color:var(--muted);margin:8px 0 0;font-size:13px}.hint{font:10px 'DM Mono',monospace;color:#747d94;letter-spacing:.08em;padding-bottom:3px}.hint kbd{font:inherit;color:#c1c8d8;border:1px solid #343b50;border-radius:4px;padding:3px 5px;background:#141a29}
+    .game-shell{position:relative;background:#0d1220;border:1px solid #293149;border-radius:19px;padding:13px;box-shadow:0 24px 70px #0006,0 1px 0 #ffffff08 inset;overflow:hidden}.canvas-wrap{position:relative;overflow:hidden;border-radius:11px;background:#0b1120}.canvas-wrap:after{content:"";position:absolute;inset:0;pointer-events:none;border:1px solid #fff08;border-radius:11px}canvas{display:block;width:100%;height:auto;aspect-ratio:3/2;touch-action:none}
+    .overlay{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(90deg,#090d18e8,#0b1020d9);backdrop-filter:blur(4px);transition:opacity .2s,visibility .2s}.overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.overlay-card{text-align:center;width:min(90%,400px);padding:28px 20px}.overlay-icon{margin:0 auto 15px;width:48px;height:48px;border-radius:15px;display:grid;place-items:center;color:var(--mint);border:1px solid #39564f;background:#15302988}.overlay-icon svg{width:26px}.overlay h2{font-size:27px;letter-spacing:-.04em;margin:0 0 9px}.overlay p{font-size:13px;line-height:1.55;color:#a4adc2;margin:0 auto 19px;max-width:330px}.primary{border:0;border-radius:9px;padding:12px 23px;background:var(--mint);color:#0a1915;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 5px 25px #a6ffd426;transition:transform .15s,filter .15s}.primary:hover{filter:brightness(1.08);transform:translateY(-1px)}.primary:active{transform:translateY(1px)}.overlay-note{font:10px 'DM Mono',monospace;color:#747d94;margin-top:13px}
+    .hud{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}.stat{height:66px;padding:12px 15px;border:1px solid #252c40;border-radius:10px;background:#111624;display:flex;align-items:center;justify-content:space-between}.stat-label{font:9px 'DM Mono',monospace;letter-spacing:.12em;color:#818ba3;text-transform:uppercase}.stat-value{font-size:22px;font-weight:600;letter-spacing:-.04em;font-variant-numeric:tabular-nums}.stat-unit{font:9px 'DM Mono',monospace;color:#717a92;margin-left:4px}.stat-score .stat-value{color:var(--mint)}.stat-best .stat-value{color:var(--lime)}.stat-walls .stat-value{color:#d6dbea}
+    .underbar{display:flex;justify-content:space-between;align-items:center;margin-top:15px}.controls-copy{font-size:11px;color:#858da5}.controls-copy strong{color:#ccd2e1;font-weight:500}.actions{display:flex;align-items:center;gap:8px}.action-btn{height:34px;padding:0 12px;border:1px solid #30374b;border-radius:8px;background:#131929;color:#b9c1d4;font-size:11px;cursor:pointer;transition:background .15s,border .15s}.action-btn:hover{background:#1b2234;border-color:#48516c}.action-btn .ico{color:var(--mint);padding-right:5px}.touch-pad{display:none;grid-template-columns:repeat(3,43px);grid-template-rows:repeat(2,38px);gap:4px;justify-content:center;margin:15px auto 0}.touch-pad button{border:1px solid #30374b;border-radius:9px;background:#141a29;color:#d9e3f1;font-size:15px;touch-action:manipulation;user-select:none}.touch-pad button:active{background:#274238;border-color:#7db89e}.touch-pad .up{grid-column:2}.touch-pad .left{grid-column:1;grid-row:2}.touch-pad .down{grid-column:2;grid-row:2}.touch-pad .right{grid-column:3;grid-row:2}
+    .footer{display:flex;justify-content:space-between;margin:15px 3px 0;color:#606a81;font:9px 'DM Mono',monospace;letter-spacing:.07em}.footer .accent{color:#9ba5ba}
+    @media(min-width:621px) and (max-height:850px){.app{width:min(100%,max(460px,calc((100vh - 400px)*3/2 + 26px)))}.canvas-wrap{width:min(100%,max(434px,calc((100vh - 400px)*3/2)));margin-inline:auto}}
+    @media(max-width:620px){body{padding:18px 13px max(16px,env(safe-area-inset-bottom));align-items:flex-start}.topbar{margin-bottom:20px}.heading{margin-bottom:14px}.heading p{font-size:12px}.hint{display:none}.game-shell{padding:8px;border-radius:14px}.canvas-wrap{border-radius:8px}.hud{gap:6px;margin-top:8px}.stat{height:57px;padding:9px 10px;display:block}.stat-label{font-size:8px}.stat-value{font-size:19px;margin-top:3px}.underbar{margin-top:11px}.controls-copy{font-size:10px}.touch-pad{display:grid}.footer{margin-top:11px;font-size:8px}.live-pill{font-size:9px;padding:7px 9px}.brand-mark{width:34px;height:34px}.overlay-card{padding:18px 12px}.overlay h2{font-size:24px}.overlay-icon{width:42px;height:42px;margin-bottom:11px}}
+    @media(max-width:360px){body{padding-left:9px;padding-right:9px}.stat{padding:8px}.actions{gap:5px}.action-btn{padding:0 8px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 16h6v-6h6V4h4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="4" r="1.5" fill="currentColor"/></svg></div><div><div class="brand-name">WALLRUN</div><div class="brand-sub">A SNAKE GAME, REWIRED</div></div></div>
+      <div class="live-pill"><span class="live-dot"></span><span id="statusLabel">READY TO RUN</span></div>
+    </header>
+    <section class="heading"><div><div class="eyebrow">01 / THE RULES HAVE CHANGED</div><h1>Make your mark.</h1><p>Eat the glow. Leave a wall. Never look back.</p></div><div class="hint"><kbd>←</kbd> <kbd>↑</kbd> <kbd>↓</kbd> <kbd>→</kbd> &nbsp; MOVE</div></section>
+    <section class="game-shell" aria-label="Snake game">
+      <div class="canvas-wrap"><canvas id="game" width="768" height="512" aria-label="Game board. Use arrow keys or WASD to move."></canvas>
+        <div class="overlay" id="overlay"><div class="overlay-card"><div class="overlay-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 16h6v-6h6V4h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="4" r="1.5" fill="currentColor"/></svg></div><h2 id="overlayTitle">Ready to run?</h2><p id="overlayText">Most snakes grow. You build. Collect energy and carve a path through the grid—your trail stays behind as a wall.</p><button class="primary" id="startButton">Start run <span aria-hidden="true">↗</span></button><div class="overlay-note">ARROW KEYS / WASD &nbsp;·&nbsp; SPACE TO PAUSE</div></div></div>
+      </div>
+      <div class="hud" aria-live="polite">
+        <div class="stat stat-score"><div class="stat-label">Score</div><div><span class="stat-value" id="score">000</span><span class="stat-unit">PTS</span></div></div>
+        <div class="stat stat-best"><div class="stat-label">Personal best</div><div><span class="stat-value" id="best">000</span><span class="stat-unit">PTS</span></div></div>
+        <div class="stat stat-walls"><div class="stat-label">Walls laid</div><div><span class="stat-value" id="walls">000</span><span class="stat-unit">CELLS</span></div></div>
+      </div>
+    </section>
+    <div class="underbar"><div class="controls-copy"><strong>Tip:</strong> Every step becomes permanent. Plan your next turn.</div><div class="actions"><button class="action-btn" id="pauseButton" aria-label="Pause game"><span class="ico">Ⅱ</span> Pause</button><button class="action-btn" id="soundButton" aria-label="Toggle sound"><span class="ico" id="soundIcon">♪</span> <span id="soundText">Sound on</span></button></div></div>
+    <div class="touch-pad" aria-label="Touch direction controls"><button class="up" data-dir="up" aria-label="Move up">▲</button><button class="left" data-dir="left" aria-label="Move left">◀</button><button class="down" data-dir="down" aria-label="Move down">▼</button><button class="right" data-dir="right" aria-label="Move right">▶</button></div>
+    <footer class="footer"><span>NO GROWTH. JUST GOOD DESIGN.</span><span>MADE TO KEEP MOVING <span class="accent">✳</span></span></footer>
+  </main>
+<script>
+(() => {
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const overlay = document.getElementById('overlay');
+  const title = document.getElementById('overlayTitle');
+  const text = document.getElementById('overlayText');
+  const startButton = document.getElementById('startButton');
+  const statusLabel = document.getElementById('statusLabel');
+  const scoreEl = document.getElementById('score');
+  const bestEl = document.getElementById('best');
+  const wallsEl = document.getElementById('walls');
+  const pauseButton = document.getElementById('pauseButton');
+  const soundButton = document.getElementById('soundButton');
+  const soundText = document.getElementById('soundText');
+  const COLS = 24, ROWS = 16, CELL = 32;
+  const dirs = {up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}};
+  let walls, head, direction, nextDirection, food, score, state = 'ready', timer = 0;
+  let best = Number(localStorage.getItem('wallrun-best') || 0);
+  let soundOn = true, audio;
+  bestEl.textContent = String(best).padStart(3,'0');
+  const rand = n => Math.floor(Math.random()*n);
+  function placeFood(){
+    const open=[];
+    for(let y=0;y<ROWS;y++) for(let x=0;x<COLS;x++) if(!walls.has(y*COLS+x) && !(head.x===x&&head.y===y)) open.push({x,y});
+    food=open.length?open[rand(open.length)]:null;
+  }
+  function reset(){
+    walls=new Set(); head={x:5,y:8}; direction={x:1,y:0}; nextDirection=direction; score=0;
+    scoreEl.textContent='000'; wallsEl.textContent='000'; placeFood(); draw();
+  }
+  function start(){reset();state='playing';statusLabel.textContent='RUN IN PROGRESS';overlay.classList.add('hidden');pauseButton.innerHTML='<span class="ico">Ⅱ</span> Pause';}
+  function pause(){if(state==='playing'){state='paused';statusLabel.textContent='PAUSED';title.textContent='Take a breather.';text.textContent='Your walls aren’t going anywhere. Pick up where you left off when you’re ready.';startButton.textContent='Resume run';overlay.classList.remove('hidden');pauseButton.innerHTML='<span class="ico">▶</span> Resume';}else if(state==='paused'){state='playing';statusLabel.textContent='RUN IN PROGRESS';overlay.classList.add('hidden');pauseButton.innerHTML='<span class="ico">Ⅱ</span> Pause';}}
+  function end(){state='over';statusLabel.textContent='RUN ENDED';title.textContent=score>0?'Nice line.':'Run complete.';text.textContent=`You scored ${score} point${score===1?'':'s'} and laid ${walls.size} wall${walls.size===1?'':'s'}. Ready to draw a new route?`;startButton.textContent='Run it back';overlay.classList.remove('hidden');pauseButton.innerHTML='<span class="ico">↻</span> Restart';}
+  function setDir(name){const d=dirs[name];if(!d||state!=='playing')return;if(d.x===-direction.x&&d.y===-direction.y)return;nextDirection=d;}
+  function beep(freq=660){if(!soundOn)return;try{audio ||= new (window.AudioContext||window.webkitAudioContext)();const osc=audio.createOscillator(),gain=audio.createGain();osc.type='sine';osc.frequency.value=freq;gain.gain.setValueAtTime(.055,audio.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.12);osc.connect(gain);gain.connect(audio.destination);osc.start();osc.stop(audio.currentTime+.12);}catch(e){}}
+  function step(){
+    direction=nextDirection;const nx=head.x+direction.x,ny=head.y+direction.y,key=ny*COLS+nx;
+    if(nx<0||nx>=COLS||ny<0||ny>=ROWS||walls.has(key)){end();return;}
+    walls.add(head.y*COLS+head.x);head={x:nx,y:ny};
+    if(food&&head.x===food.x&&head.y===food.y){score++;scoreEl.textContent=String(score).padStart(3,'0');if(score>best){best=score;localStorage.setItem('wallrun-best',best);bestEl.textContent=String(best).padStart(3,'0');}beep(740);placeFood();}
+    wallsEl.textContent=String(walls.size).padStart(3,'0');draw();
+  }
+  function rounded(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#0b1120';ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.strokeStyle='rgba(146,164,203,.075)';ctx.lineWidth=1;
+    for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*CELL+.5,0);ctx.lineTo(x*CELL+.5,canvas.height);ctx.stroke();}
+    for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*CELL+.5);ctx.lineTo(canvas.width,y*CELL+.5);ctx.stroke();}
+    walls.forEach(k=>{const x=k%COLS,y=Math.floor(k/COLS);ctx.fillStyle='#315046';rounded(x*CELL+4,y*CELL+4,CELL-8,CELL-8,6);ctx.fillStyle='#a6ffd4';ctx.globalAlpha=.22;rounded(x*CELL+7,y*CELL+7,CELL-14,3,2);ctx.globalAlpha=1;});
+    if(food){const cx=food.x*CELL+CELL/2,cy=food.y*CELL+CELL/2;ctx.save();ctx.shadowColor='#d7ff70';ctx.shadowBlur=18;ctx.fillStyle='#d7ff70';ctx.beginPath();ctx.arc(cx,cy,7,0,Math.PI*2);ctx.fill();ctx.restore();ctx.fillStyle='#fbffd9';ctx.beginPath();ctx.arc(cx-2,cy-2,2,0,Math.PI*2);ctx.fill();}
+    if(head){ctx.save();ctx.shadowColor='#adffda';ctx.shadowBlur=18;ctx.fillStyle='#a6ffd4';rounded(head.x*CELL+3,head.y*CELL+3,CELL-6,CELL-6,9);ctx.restore();
+      const cx=head.x*CELL+CELL/2+direction.x*5,cy=head.y*CELL+CELL/2+direction.y*5;ctx.fillStyle='#0c2821';ctx.beginPath();ctx.arc(cx,cy,2.2,0,Math.PI*2);ctx.fill();}
+  }
+  function frame(t){if(state==='playing'){const interval=Math.max(83,155-score*2);if(t-timer>=interval){timer=t;step();}}requestAnimationFrame(frame);}
+  startButton.addEventListener('click',()=>{if(state==='paused')pause();else start();});
+  pauseButton.addEventListener('click',()=>{if(state==='playing'||state==='paused')pause();else start();});
+  soundButton.addEventListener('click',()=>{soundOn=!soundOn;soundText.textContent=soundOn?'Sound on':'Sound off';document.getElementById('soundIcon').textContent=soundOn?'♪':'×';});
+  document.addEventListener('keydown',e=>{const map={ArrowUp:'up',w:'up',W:'up',ArrowDown:'down',s:'down',S:'down',ArrowLeft:'left',a:'left',A:'left',ArrowRight:'right',d:'right',D:'right'};if(map[e.key]){e.preventDefault();setDir(map[e.key]);if(state==='ready')start();}else if(e.code==='Space'){e.preventDefault();if(state==='playing'||state==='paused')pause();else start();}else if(e.key==='Enter'&&(state==='ready'||state==='over'))start();});
+  document.querySelectorAll('.touch-pad button').forEach(button=>button.addEventListener('pointerdown',e=>{e.preventDefault();if(state==='ready')start();setDir(button.dataset.dir);}));
+  canvas.addEventListener('pointerdown',e=>{if(state!=='playing')return;const r=canvas.getBoundingClientRect(),dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;if(Math.abs(dx)>Math.abs(dy))setDir(dx>0?'right':'left');else setDir(dy>0?'down':'up');});
+  reset();statusLabel.textContent='READY TO RUN';requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
